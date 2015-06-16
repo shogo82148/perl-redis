@@ -297,11 +297,14 @@ sub wait_all_responses {
 sub wait_one_response {
   my ($self) = @_;
 
-  my $handler = shift @{ $self->{queue} };
+  my $queue = $self->{queue};
+  my $handler = $queue->[0];
   return unless $handler;
 
   my ($command, $cb, $collect_errors) = @$handler;
-  $cb->($self->__read_response($command, $collect_errors));
+  my @response = $self->__read_response($command, $collect_errors);
+  shift @$queue;
+  $cb->(@response);
 
   return;
 }
